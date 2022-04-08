@@ -117,9 +117,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
 
     for filename in glob.glob(root_path+"/cats_SFH/*.csv"):
       object_id = int((filename.split("_")[-1].split('.')[0])) # Extracting object id
-      print(object_id)
+      
 
-      try:
+      if True:
         # Opening multiband TNG image 
         img = stack_bands(root_path+'/images/TNG100/sdss/sn99/noiseless/', object_id)
         example = {'noiseless_griz': img.astype('float32')}
@@ -154,5 +154,5 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
                         'object_id': object_id})
 
         yield object_id, example
-      except:
+      else:
         continue      
