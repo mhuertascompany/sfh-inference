@@ -86,7 +86,7 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
             "Mstar_Half": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
-            #'last_over_max': tf.float32,
+            'last_over_max': tf.float32,
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
         }),
