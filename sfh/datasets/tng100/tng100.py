@@ -75,9 +75,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
         #  and redshift value of last major merger
         features=tfds.features.FeaturesDict({
             'noiseless_griz': tfds.features.Tensor(shape=(128, 128, 4), dtype=tf.float32),
-            'stellar_light': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
-            'velocity_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
-            'velocity_dispersion_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
+            #'stellar_light': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
+            #'velocity_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
+            #'velocity_dispersion_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
             "sed": tfds.features.Tensor(shape=(143,), dtype=tf.float32),
             "time": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "SFR_halfRad": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
@@ -86,8 +86,8 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
             "Mstar_Half": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
-            'last_over_max': tf.float32,
-            'last_major_merger': tf.float32,
+            #'last_over_max': tf.float32,
+            #'last_major_merger': tf.float32,
             'object_id': tf.int32
         }),
         supervised_keys=('noiseless_griz', 'last_major_merger'), 
@@ -107,9 +107,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
                                index_col='Illustris_ID')
 
     # Create new dataframe with equivalence values between Snapshots numbers and redshifts, age, loopback time
-    snaps = pd.read_csv(os.path.join(os.path.dirname(__file__), './')+"/snaps.csv", 
-                        index_col=0, names=['sn', 'z', 'age', 'lbt'])
-    a = 1./(1. + np.array(snaps['z'][::-1]))
+    #snaps = pd.read_csv(os.path.join(os.path.dirname(__file__), './')+"/snaps.csv", 
+    #                    index_col=0, names=['sn', 'z', 'age', 'lbt'])
+    #a = 1./(1. + np.array(snaps['z'][::-1]))
 
     # Opening sed data
     phot_cat = Table.read(root_path+"/phot_TNG100_dylan_143.csv")
@@ -124,10 +124,10 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
         example = {'noiseless_griz': img.astype('float32')}
 
         # Opening kinematic data
-        kin_image = fits.getdata(root_path+'/mergers/maps/sn99/moments_TNG100-1_99_%d_stars_i0__32.fits'%object_id, ext=0)
-        example.update({'stellar_light': kin_image[0].astype('float32'),
-                        'velocity_map': kin_image[1].astype('float32'),
-                        'velocity_dispersion_map': kin_image[2].astype('float32')})
+        #kin_image = fits.getdata(root_path+'/mergers/maps/sn99/moments_TNG100-1_99_%d_stars_i0__32.fits'%object_id, ext=0)
+        #example.update({'stellar_light': kin_image[0].astype('float32'),
+         #               'velocity_map': kin_image[1].astype('float32'),
+         #               'velocity_dispersion_map': kin_image[2].astype('float32')})
 
         # Retrieve sed row for given galaxy
         row = phot_cat[phot_cat['subhaloIDs'] == object_id][0]
@@ -140,9 +140,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
         example.update({'time': np.array(a).astype('float32')})
 
         # Get snapshot number of the last major merger for the current object_id from the mergers_data dataframe
-        SnapNumLastMajorMerger = mergers_data.loc[object_id,'SnapNumLastMajorMerger']
+        #SnapNumLastMajorMerger = mergers_data.loc[object_id,'SnapNumLastMajorMerger']
         # Convert snapshot number to lookback time using the snaps dataframe
-        example.update({'last_major_merger': 1./(1.+snaps.loc[SnapNumLastMajorMerger,'z']).astype('float32')})
+        #example.update({'last_major_merger': 1./(1.+snaps.loc[SnapNumLastMajorMerger,'z']).astype('float32')})
 
         # Compute mass history summaries
         mass_history_summaries = find_summaries(example['Mstar_Half'],
