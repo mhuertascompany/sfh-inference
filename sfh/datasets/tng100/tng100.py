@@ -13,7 +13,7 @@ _DESCRIPTION = """
 """
 
 _CITATION = ""
-_URL = "https://github.com/EiffL/sfh-inference-hackathon"
+_URL = "https://github.com/mhuertascompany/sfh-inference-hackathon"
 
 ## My functions added ##
 def stack_bands(img_dir,gal_id):
