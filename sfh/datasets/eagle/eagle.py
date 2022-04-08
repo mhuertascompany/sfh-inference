@@ -110,7 +110,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
         
    
 
-    for i in range(100):
+    for i in range(len(mstar)):
         object_id = i
 
         if True:
