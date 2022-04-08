@@ -74,7 +74,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #"Mstar_Half": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
-            #'last_over_max': tf.float32,
+            'last_over_max': tf.float32,
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
         }),
@@ -148,7 +148,9 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #quantiles
             mass_history_summaries = find_summaries(example['Mstar'],
                                                 example['time'])
+            last_over_max = example['Mstar'][0]/np.max(example['Mstar'])
             example.update({'mass_quantiles': mass_history_summaries,
+                        'last_over_max': last_over_max,
                         'object_id': object_id})
             
             
