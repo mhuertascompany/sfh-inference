@@ -107,9 +107,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
       #                         index_col='Illustris_ID')
 
     # Create new dataframe with equivalence values between Snapshots numbers and redshifts, age, loopback time
-    #snaps = pd.read_csv(os.path.join(os.path.dirname(__file__), './')+"/snaps.csv", 
-    #                    index_col=0, names=['sn', 'z', 'age', 'lbt'])
-    #a = 1./(1. + np.array(snaps['z'][::-1]))
+    snaps = pd.read_csv(root_path+"/snaps.csv", 
+                        index_col=0, names=['sn', 'z', 'age', 'lbt'])
+    a = 1./(1. + np.array(snaps['z'][::-1]))
 
     # Opening sed data
     phot_cat = Table.read(root_path+"/phot_TNG100_dylan_143.csv")
