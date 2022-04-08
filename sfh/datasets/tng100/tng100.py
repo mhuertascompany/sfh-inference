@@ -102,9 +102,9 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
 
     # Create new dataframe with the columns 'Illustris_ID' and 'SnapNumLastMajorMerger'
     # of the TNG100_SDSS_MajorMergers.csv file
-    mergers_data = pd.read_csv(root_path+'/mergers/TNG100_SDSS_MajorMergers.csv', 
-                               usecols=['Illustris_ID','SnapNumLastMajorMerger'],
-                               index_col='Illustris_ID')
+    #mergers_data = pd.read_csv(root_path+'/mergers/TNG100_SDSS_MajorMergers.csv', 
+     #                          usecols=['Illustris_ID','SnapNumLastMajorMerger'],
+      #                         index_col='Illustris_ID')
 
     # Create new dataframe with equivalence values between Snapshots numbers and redshifts, age, loopback time
     #snaps = pd.read_csv(os.path.join(os.path.dirname(__file__), './')+"/snaps.csv", 
@@ -117,6 +117,7 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
 
     for filename in glob.glob(root_path+"/cats_SFH/*.csv"):
       object_id = int((filename.split("_")[-1].split('.')[0])) # Extracting object id
+      print(object_id)
 
       try:
         # Opening multiband TNG image 
