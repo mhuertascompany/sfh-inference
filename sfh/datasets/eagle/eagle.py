@@ -78,7 +78,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
         }),
-        supervised_keys=('noiseless_griz', 'last_major_merger'), 
+        supervised_keys=('sed', 'mass_quantiles'), 
     )
 
   def _split_generators(self, dl):
@@ -113,7 +113,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     for i in range(len(mstar)):
         object_id = i
 
-        if True:
+        try:
             
             
             if np.log10(mstar[i])<9.5:
@@ -160,5 +160,5 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     
 
             yield object_id, example
-        else:
+        except:
             continue      
