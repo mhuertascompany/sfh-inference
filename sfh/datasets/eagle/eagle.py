@@ -132,7 +132,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #example.update({'sed': np.array(flux).astype('float32')})
 
         
-            #mstar growth
+            
      
     
             mgrowth = np.cumsum(deltat*sfh[i])
