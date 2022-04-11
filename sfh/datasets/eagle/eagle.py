@@ -47,8 +47,8 @@ def find_summaries(mass, time, percentiles=np.linspace(0.1, 0.9, 9)):
 class Eagle(tfds.core.GeneratorBasedBuilder):
   """Eagle galaxy dataset"""  
 
-  VERSION = tfds.core.Version("1.0.0")
-  RELEASE_NOTES = {'1.0.0': 'Initial release.',}
+  VERSION = tfds.core.Version("2.0.0")
+  RELEASE_NOTES = {'2.0.0': 'Initial release.',}
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
