@@ -142,15 +142,17 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
      
     
             mgrowth = np.cumsum(deltat*sfh[i])
-            example.update({'Mstar': np.array(mgrowth).astype('float32')})
+            
    
 
             #sfh
             time_norm = time / np.max(time)*100
             xvals = np.linspace(0, 100, 100)
-            yinterp = np.interp(xvals, time_norm, sfh[i])    
+            yinterp = np.interp(xvals, time_norm, sfh[i]) 
+            minterp = np.interp(xvals, time_norm, mgrowth)    
             example.update({'time': np.array(xvals).astype('float32')})
             example.update({'SFR_Max': np.array(yinterp).astype('float32')})
+            example.update({'Mstar': np.array(minterp).astype('float32')})
             
             
             #quantiles
