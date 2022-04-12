@@ -116,7 +116,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     for i in range(len(mstar)):
         object_id = i
 
-        try:
+        if True:
             
             
             if np.log10(mstar[i])<9.5:
@@ -169,5 +169,5 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     
 
             yield object_id, example
-        except:
+        else:
             continue      
