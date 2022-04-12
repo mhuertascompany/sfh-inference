@@ -47,13 +47,13 @@ def find_summaries(mass, time, percentiles=np.linspace(0.1, 0.9, 9)):
 class Eagle(tfds.core.GeneratorBasedBuilder):
   """Eagle galaxy dataset"""  
 
-  VERSION = tfds.core.Version("2.0.0")
-  RELEASE_NOTES = {'2.0.0': 'Initial release.',}
+  VERSION = tfds.core.Version("3.0.0")
+  RELEASE_NOTES = {'3.0.0': 'Initial release.',}
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
     """Returns the dataset metadata."""
-    N_TIMESTEPS = 280
+    N_TIMESTEPS = 100
     return tfds.core.DatasetInfo(
         builder=self,
         description=_DESCRIPTION,
@@ -66,7 +66,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #'stellar_light': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
             #'velocity_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
             #'velocity_dispersion_map': tfds.features.Tensor(shape=(512, 512), dtype=tf.float32),
-            "sed": tfds.features.Tensor(shape=(143,), dtype=tf.float32),
+            "sed": tfds.features.Tensor(shape=(125,), dtype=tf.float32),
             "time": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             #"SFR_halfRad": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             #"SFR_Rad": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
@@ -74,6 +74,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             #"Mstar_Half": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
+            'inds_valid': tfds.features.Tensor(shape=(143,), dtype=tf.bool),
             #'last_over_max': tf.float32,
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
@@ -92,20 +93,22 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     # read EAGLE hd5y + filter names + filter wavelength
     hf = h5py.File(root_path+'/dataMagnitudes_2000kpc_EMILES_PDXX_DUST_CH_028_z000p000.hdf5', 'r')
     wl = np.loadtxt(root_path+"/wl.csv")
+    inds = np.argsort(wl)
     text_file = open(root_path+"/fnames.csv", "r")
     fname_list = text_file.readlines()
     sfh = hf.get('Data/SFhistory')
     tbins = hf.get('Data/SFbins')
     time = (tbins[1:] + tbins[:-1] )/2.
+    deltat=tbins[1:] - tbins[:-1]
 
     mstar  = hf.get('Data/StellarMassNew')  
     
     # sfh
-    sfh = hf.get('Data/SFhistory')
+    #sfh = hf.get('Data/SFhistory')
     nobjects = sfh.shape[0]
-    tbins = hf.get('Data/SFbins')
-    time = (tbins[1:] + tbins[:-1] )/2.
-    deltat=tbins[1:] - tbins[:-1]
+    #tbins = hf.get('Data/SFbins')
+    #time = (tbins[1:] + tbins[:-1] )/2.
+    
    
         
    
@@ -113,7 +116,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     for i in range(len(mstar)):
         object_id = i
 
-        if True:
+        try:
             
             
             if np.log10(mstar[i])<9.5:
@@ -123,12 +126,16 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     
             mag = [] 
             for f in fname_list:
-                mag.append(hf['Data'][f.strip()][1])
+                mag.append(hf['Data'][f.strip()][i])
             app_mag = np.array(mag)+5*(np.log10(20e6)-1) #assume at 20pc
+            flux = flux[inds]
             flux = 10**(.4*(-app_mag+8.90)) #convert to Jy
+            inds_valid = np.isfinite(flux)
+            flux = flux[inds_valid]
+            
             
             example = {'sed': flux}
-            
+            example.update({'inds_valid': np.array(inds_valid).astype('bool')})
             #example.update({'sed': np.array(flux).astype('float32')})
 
         
@@ -140,9 +147,11 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
    
 
             #sfh
-    
-            example.update({'time': np.array(time).astype('float32')})
-            example.update({'SFR_Max': np.array(sfh[i]).astype('float32')})
+            time_norm = time / np.max(time)*100
+            xvals = np.linspace(0, 100, 100)
+            yinterp = np.interp(xvals, time_norm, sfh[i])    
+            example.update({'time': np.array(time_norm).astype('float32')})
+            example.update({'SFR_Max': np.array(yinterp).astype('float32')})
             
             
             #quantiles
@@ -160,5 +169,5 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     
 
             yield object_id, example
-        else:
+        except:
             continue      
