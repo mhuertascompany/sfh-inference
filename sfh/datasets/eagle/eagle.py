@@ -128,7 +128,6 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             for f in fname_list:
                 mag.append(hf['Data'][f.strip()][i])
             app_mag = np.array(mag)+5*(np.log10(20e6)-1) #assume at 20pc
-            flux = flux[inds]
             flux = 10**(.4*(-app_mag+8.90)) #convert to Jy
             inds_valid = np.isfinite(flux)
             flux = flux[inds_valid]
