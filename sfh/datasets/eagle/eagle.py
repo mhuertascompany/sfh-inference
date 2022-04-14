@@ -48,7 +48,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
   """Eagle galaxy dataset"""  
 
   VERSION = tfds.core.Version("3.0.0")
-  RELEASE_NOTES = {'3.0.0': 'Initial release.',}  #Changed from 1.0.0 to 2.0.0
+  RELEASE_NOTES = {'3.0.0': 'Initial release.',}  #Changed from 1.0.0 to 2.0.0 to 3.0.0
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
