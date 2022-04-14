@@ -59,8 +59,8 @@ def find_summaries(mass, time, percentiles=np.linspace(0.1, 0.9, 9)):
 class Tng100(tfds.core.GeneratorBasedBuilder):
   """TNG100 galaxy dataset"""  
 
-  VERSION = tfds.core.Version("1.0.0")
-  RELEASE_NOTES = {'1.0.0': 'Initial release.',}
+  VERSION = tfds.core.Version("2.0.0")
+  RELEASE_NOTES = {'2.0.0': 'Change flux units. wl is sort.',}
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
@@ -86,6 +86,7 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
             "Mstar_Half": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
+            'wl_sort': tfds.features.Tensor(shape=(143,), dtype=tf.float32),
             'last_over_max': tf.float32,
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
@@ -115,6 +116,11 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
     phot_cat = Table.read(root_path+"/phot_TNG100_dylan_143.csv")
     phot_cat['subhaloIDs'] = phot_cat['subhaloIDs'].astype('int') # convert to int
 
+    #sorting wavelength
+    wl = np.loadtxt(root_path+"/wl.csv")
+    inds = np.argsort(wl)
+    wl_sort = wl[inds]
+
     for filename in glob.glob(root_path+"/cats_SFH/*.csv"):
       object_id = int((filename.split("_")[-1].split('.')[0])) # Extracting object id
       
@@ -132,7 +138,12 @@ class Tng100(tfds.core.GeneratorBasedBuilder):
 
         # Retrieve sed row for given galaxy
         row = phot_cat[phot_cat['subhaloIDs'] == object_id][0]
-        example.update({'sed': np.array(list(row.values())[1:]).astype('float32')})
+        mag = np.array(list(row.values())[1:]).astype('float32')
+        app_mag = np.array(mag)+5*(np.log10(20e6)-1) #assume at 20pc
+        flux = 10**(.4*(-app_mag+8.90))
+        flux = flux[inds]
+        example.update({'sed': np.array(flux).astype('float32')})
+        example.update({'wl_sort': np.array(wl_sort).astype('float32')})
         
         # Opening sfh data and interpolating it on common grid, in reverse time
         sfh = Table.read(filename)

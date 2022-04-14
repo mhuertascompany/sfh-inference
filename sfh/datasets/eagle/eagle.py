@@ -47,8 +47,8 @@ def find_summaries(mass, time, percentiles=np.linspace(0.1, 0.9, 9)):
 class Eagle(tfds.core.GeneratorBasedBuilder):
   """Eagle galaxy dataset"""  
 
-  VERSION = tfds.core.Version("3.0.0")
-  RELEASE_NOTES = {'3.0.0': 'Initial release.',}
+  VERSION = tfds.core.Version("4.0.0")
+  RELEASE_NOTES = {'4.0.0': 'Sort wl.',}
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
@@ -75,7 +75,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
             "Mstar": tfds.features.Tensor(shape=(N_TIMESTEPS,), dtype=tf.dtypes.float32),
             'mass_quantiles': tfds.features.Tensor(shape=(9,), dtype=tf.float32),
             'inds_valid': tfds.features.Tensor(shape=(143,), dtype=tf.bool),
-            #'last_over_max': tf.float32,
+            'wl_sort': tfds.features.Tensor(shape=(143,), dtype=tf.float32),
             #'last_major_merger': tf.float32,
             'object_id': tf.int32
         }),
@@ -94,6 +94,7 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
     hf = h5py.File(root_path+'/dataMagnitudes_2000kpc_EMILES_PDXX_DUST_CH_028_z000p000.hdf5', 'r')
     wl = np.loadtxt(root_path+"/wl.csv")
     inds = np.argsort(wl)
+    wl_sort = wl[inds]
     text_file = open(root_path+"/fnames.csv", "r")
     fname_list = text_file.readlines()
     sfh = hf.get('Data/SFhistory')
@@ -129,12 +130,14 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
                 mag.append(hf['Data'][f.strip()][i])
             app_mag = np.array(mag)+5*(np.log10(20e6)-1) #assume at 20pc
             flux = 10**(.4*(-app_mag+8.90)) #convert to Jy
+            flux = flux[inds]  # sorting the flux
             inds_valid = np.isfinite(flux)
             flux = flux[inds_valid]
             
             
             example = {'sed': flux}
             example.update({'inds_valid': np.array(inds_valid).astype('bool')})
+            example.update({'wl_sort': np.array(wl_sort).astype('float32')})
             #example.update({'sed': np.array(flux).astype('float32')})
 
         
