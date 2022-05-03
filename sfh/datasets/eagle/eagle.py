@@ -50,10 +50,6 @@ class Eagle(tfds.core.GeneratorBasedBuilder):
 <<<<<<< HEAD
   VERSION = tfds.core.Version("4.0.0")
   RELEASE_NOTES = {'4.0.0': 'Sort wl.',}
-=======
-  VERSION = tfds.core.Version("3.0.0")
-  RELEASE_NOTES = {'3.0.0': 'Initial release.',}  #Changed from 1.0.0 to 2.0.0 to 3.0.0
->>>>>>> patri
   MANUAL_DOWNLOAD_INSTRUCTIONS = "Nothing to download. Dataset was generated at first call."
   
   def _info(self) -> tfds.core.DatasetInfo:
